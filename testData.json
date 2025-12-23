@@ -1,0 +1,64 @@
+{
+    "global": {},
+    "testSuites": [
+        {
+            "title": "Cheap Flights Search",
+            "tests": [
+                {
+                    "title": "To verify the search origin and destination functionality in cheap flights",
+                    "testData": [
+                        {
+                            "signText": "Sign in",
+                            "originCity": "New York, United States",
+                            "destinationCity": "India"
+                        }
+                    ]
+                },
+                {
+                    "title": "To verify selecting departure date and Return date functionality",
+                    "testData": [
+                        {
+                            "departureDateAndMonth": "January 2026",
+                            "departureDate": "15",
+                            "returnDateAndMonth": "March 2026",
+                            "returnDate": "10",
+                            "travelersType": "Adults",
+                            "numberOfTravelers": "4"
+                        }
+                    ]
+                },
+                {
+                    "title": "To verify search results page",
+                    "testData": [
+                        {
+                            "searchResultsPageTitle": "Explore"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Booking App",
+            "tests": [
+                {
+                    "title": "To verify the response payload of create booking api",
+                    "testData": [
+                        {
+                            "createBooking": {
+                                "firstname": "Jim",
+                                "lastname": "Brown",
+                                "totalprice": 111,
+                                "depositpaid": true,
+                                "bookingdates": {
+                                    "checkin": "2018-01-01",
+                                    "checkout": "2019-01-01"
+                                },
+                                "additionalneeds": "Breakfast"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

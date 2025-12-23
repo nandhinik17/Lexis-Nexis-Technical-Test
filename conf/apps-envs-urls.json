@@ -1,0 +1,14 @@
+{
+ "dev":{
+    "web":{
+        "url": "https://www.cheapflights.com.au/"
+    },
+    "api":{
+        "url": "https://restful-booker.herokuapp.com",
+        "endpoints": {
+            "createBooking": "/booking",
+            "getBooking": "/booking/{id}"
+        }
+    }
+ }
+}
