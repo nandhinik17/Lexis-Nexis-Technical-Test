@@ -77,7 +77,7 @@ describe('Booking App', () => {
         await AllureReporter.addAttachment('Response Body', JSON.stringify(response.body, null, 2), 'application/json');
     })
 
-    it('To verify the response payload of update booking api', async function () {
+    it('To verify the response payload of delete booking api', async function () {
         const endpointBase = await apiHelper.getEndpoint('getBooking');
         if (!bookingID) throw new Error('bookingID is not set. Ensure create booking test ran and returned a bookingid.');
         const endpoint = `${endpointBase}${bookingID}`;
