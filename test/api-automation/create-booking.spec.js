@@ -63,6 +63,40 @@ describe('Booking App', () => {
         await AllureReporter.addAttachment('Response Body', JSON.stringify(response.body, null, 2), 'application/json');
 
     })
+    it('To verify the response payload for get booking api', async function () {
+        const endpoint = await apiHelper.getEndpoint('createBooking');
+        const response = await request(apiBaseUrl)
+            .get(endpoint)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+        await expect(response.status).toBe(200);
+        await expect(response.body.length).toBeGreaterThan(0);
+        response.body.forEach(booking => async () => {
+            await expect(booking.bookingid).toBeDefined();
+        });
+        await AllureReporter.addAttachment('Response Body', JSON.stringify(response.body, null, 2), 'application/json');
+    })
+
+    it('To verify the response payload of update booking api', async function () {
+        const endpointBase = await apiHelper.getEndpoint('getBooking');
+        if (!bookingID) throw new Error('bookingID is not set. Ensure create booking test ran and returned a bookingid.');
+        const endpoint = `${endpointBase}${bookingID}`;
+        //api-chaining
+        const authResp = await request(apiBaseUrl)
+            .post('/auth')
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({ username: 'admin', password: 'password123' });
+
+        const token = authResp.body.token;
+        const response = await request(apiBaseUrl)
+            .delete(endpoint)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .set('Cookie', `token=${token}`)
+        await expect(response.status).toBe(201);
+        await AllureReporter.addAttachment('Response Body', JSON.stringify(response.body, null, 2), 'application/json');
+    })
 
 })
 
