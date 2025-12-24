@@ -7,7 +7,7 @@
         "url": "https://restful-booker.herokuapp.com",
         "endpoints": {
             "createBooking": "/booking",
-            "getBooking": "/booking/{id}"
+            "getBooking": "/booking/"
         }
     }
  }

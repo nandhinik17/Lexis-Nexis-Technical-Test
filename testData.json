@@ -57,6 +57,24 @@
                             }
                         }
                     ]
+                },
+                {
+                    "title": "To verify the response payload of update booking api",
+                    "testData": [
+                        {
+                            "updateBooking": {
+                                "firstname": "Test",
+                                "lastname": "Automation",
+                                "totalprice": 111,
+                                "depositpaid": true,
+                                "bookingdates": {
+                                    "checkin": "2018-01-01",
+                                    "checkout": "2019-01-01"
+                                },
+                                "additionalneeds": "Breakfast"
+                            }
+                        }
+                    ]
                 }
             ]
         }

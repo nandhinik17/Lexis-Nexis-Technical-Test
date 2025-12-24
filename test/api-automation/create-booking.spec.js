@@ -6,7 +6,7 @@ const apiBaseUrl = envData[env].api.url;
 const apiHelper = require('./api-helper');
 import AllureReporter from '@wdio/allure-reporter';
 import apiMain from '../../utils/cheap-flight-main';
-const bookingID=null;
+let bookingID = null;
 describe('Booking App', () => {
     it('To verify the response payload of create booking api', async function () {
         const endpoint = await apiHelper.getEndpoint('createBooking');
@@ -28,6 +28,38 @@ describe('Booking App', () => {
         await expect(response.body.booking.bookingdates.checkin).toBe(payload.bookingdates.checkin);
         await expect(response.body.booking.bookingdates.checkout).toBe(payload.bookingdates.checkout);
         await expect(response.body.booking.additionalneeds).toBe(payload.additionalneeds);
+        await AllureReporter.addAttachment('Response Body', JSON.stringify(response.body, null, 2), 'application/json');
+
+    })
+
+    it('To verify the response payload of update booking api', async function () {
+        const endpointBase = await apiHelper.getEndpoint('getBooking');
+        if (!bookingID) throw new Error('bookingID is not set. Ensure create booking test ran and returned a bookingid.');
+        const endpoint = `${endpointBase}${bookingID}`;
+        const payload = await apiMain.getData('updateBooking');
+        //api-chaining
+        const authResp = await request(apiBaseUrl)
+            .post('/auth')
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({ username: 'admin', password: 'password123' });
+
+        const token = authResp.body.token;
+        const response = await request(apiBaseUrl)
+            .put(endpoint)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(payload);
+        await expect(response.status).toBe(200);
+        await expect(response.body).toBeDefined();
+        await expect(response.body.firstname).toBe(payload.firstname);
+        await expect(response.body.lastname).toBe(payload.lastname);
+        await expect(response.body.totalprice).toBe(payload.totalprice);
+        await expect(response.body.depositpaid).toBe(payload.depositpaid);
+        await expect(response.body.bookingdates.checkin).toBe(payload.bookingdates.checkin);
+        await expect(response.body.bookingdates.checkout).toBe(payload.bookingdates.checkout);
+        await expect(response.body.additionalneeds).toBe(payload.additionalneeds);
         await AllureReporter.addAttachment('Response Body', JSON.stringify(response.body, null, 2), 'application/json');
 
     })
