@@ -9,58 +9,178 @@ on:
     - cron: '0 2 * * *'  # Run daily at 2 AM UTC
 
 jobs:
-  test:
+  setup:
+    name: Setup Environment
     runs-on: windows-latest
-    
     strategy:
       matrix:
         node-version: [18.x]
-    
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
       
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
       
-      - name: Run API tests
+      - name: Verify Installation
+        run: npm list
+
+  lint:
+    name: Code Quality Check
+    runs-on: windows-latest
+    needs: setup
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+
+  api-tests:
+    name: API Tests Execution
+    runs-on: windows-latest
+    needs: lint
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Execute API Tests
         run: npm run api:wdio
         continue-on-error: true
+
+  web-tests:
+    name: Web UI Tests Execution
+    runs-on: windows-latest
+    needs: lint
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
       
-      - name: Run Web tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Execute Web UI Tests
         run: npm run web:wdio
         continue-on-error: true
+
+  logs:
+    name: Capture Test Logs
+    runs-on: windows-latest
+    needs: [api-tests, web-tests]
+    if: always()
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
       
-      - name: Generate Allure Report
-        if: always()
-        run: npm run report
-        continue-on-error: true
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
       
-      - name: Capture Test Logs
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Collect Test Logs
         if: always()
         run: |
           mkdir -p test-logs
+          Write-Output "=== Test Execution Logs ===" > test-logs/execution-summary.log
+          Write-Output "Timestamp: $(Get-Date)" >> test-logs/execution-summary.log
+          Write-Output "Environment: DEV" >> test-logs/execution-summary.log
+          Write-Output "" >> test-logs/execution-summary.log
           if (Test-Path allure-results) {
+            Write-Output "Allure Results Found" >> test-logs/execution-summary.log
             Get-ChildItem -Path allure-results -Filter "*.json" | ForEach-Object {
               Copy-Item $_.FullName "test-logs/$($_.Name)"
             }
+          } else {
+            Write-Output "No Allure Results Directory Found" >> test-logs/execution-summary.log
           }
-          Write-Output "Test execution completed" > test-logs/execution-summary.log
         shell: pwsh
         continue-on-error: true
       
-      - name: Upload Test Logs
+      - name: Upload Test Logs Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-logs
           path: test-logs/
+          retention-days: 30
         continue-on-error: true
+
+  reports:
+    name: Generate Reports
+    runs-on: windows-latest
+    needs: logs
+    if: always()
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Generate Allure Report
+        if: always()
+        run: npm run allure:generate
+        continue-on-error: true
+      
+      - name: Create Report Summary
+        if: always()
+        run: |
+          Write-Output "=== TEST REPORT SUMMARY ===" > report-summary.txt
+          Write-Output "Generated: $(Get-Date)" >> report-summary.txt
+          Write-Output "Status: Test execution completed" >> report-summary.txt
+          Get-Content report-summary.txt
+        shell: pwsh
+        continue-on-error: true
+
+  artifacts:
+    name: Upload Artifacts
+    runs-on: windows-latest
+    needs: [api-tests, web-tests, reports]
+    if: always()
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
       
       - name: Upload Allure Results
         if: always()
@@ -68,6 +188,8 @@ jobs:
         with:
           name: allure-results
           path: allure-results/
+          retention-days: 30
+        continue-on-error: true
       
       - name: Upload Allure Report
         if: always()
@@ -75,3 +197,14 @@ jobs:
         with:
           name: allure-report
           path: allure-report/
+          retention-days: 30
+        continue-on-error: true
+      
+      - name: Upload Report Summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-summary
+          path: report-summary.txt
+          retention-days: 30
+        continue-on-error: true
