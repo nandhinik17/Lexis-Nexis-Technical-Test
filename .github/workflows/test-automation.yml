@@ -41,6 +41,27 @@ jobs:
         run: npm run report
         continue-on-error: true
       
+      - name: Capture Test Logs
+        if: always()
+        run: |
+          mkdir -p test-logs
+          if (Test-Path allure-results) {
+            Get-ChildItem -Path allure-results -Filter "*.json" | ForEach-Object {
+              Copy-Item $_.FullName "test-logs/$($_.Name)"
+            }
+          }
+          Write-Output "Test execution completed" > test-logs/execution-summary.log
+        shell: pwsh
+        continue-on-error: true
+      
+      - name: Upload Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: test-logs/
+        continue-on-error: true
+      
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
