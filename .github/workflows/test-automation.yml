@@ -29,11 +29,11 @@ jobs:
         run: npm ci
       
       - name: Run API tests
-        run: npm run test:api
+        run: npm run api:wdio
         continue-on-error: true
       
       - name: Run Web tests
-        run: npm run test:web
+        run: npm run web:wdio
         continue-on-error: true
       
       - name: Generate Allure Report
