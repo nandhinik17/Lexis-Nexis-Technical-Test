@@ -30,7 +30,7 @@ describe('Booking App', () => {
         await expect(response.body.booking.additionalneeds).toBe(payload.additionalneeds);
         await AllureReporter.addAttachment('Response Body', JSON.stringify(response.body, null, 2), 'application/json');
 
-    })
+    });
 
     it('To verify the response payload of update booking api', async function () {
         const endpointBase = await apiHelper.getEndpoint('getBooking');
@@ -62,20 +62,20 @@ describe('Booking App', () => {
         await expect(response.body.additionalneeds).toBe(payload.additionalneeds);
         await AllureReporter.addAttachment('Response Body', JSON.stringify(response.body, null, 2), 'application/json');
 
-    })
+    });
     it('To verify the response payload for get booking api', async function () {
         const endpoint = await apiHelper.getEndpoint('createBooking');
         const response = await request(apiBaseUrl)
             .get(endpoint)
             .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
+            .set('Content-Type', 'application/json');
         await expect(response.status).toBe(200);
         await expect(response.body.length).toBeGreaterThan(0);
         response.body.forEach(booking => async () => {
             await expect(booking.bookingid).toBeDefined();
         });
         await AllureReporter.addAttachment('Response Body', JSON.stringify(response.body, null, 2), 'application/json');
-    })
+    });
 
     it('To verify the response payload of delete booking api', async function () {
         const endpointBase = await apiHelper.getEndpoint('getBooking');
@@ -93,10 +93,10 @@ describe('Booking App', () => {
             .delete(endpoint)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
-            .set('Cookie', `token=${token}`)
+            .set('Cookie', `token=${token}`);
         await expect(response.status).toBe(201);
         await AllureReporter.addAttachment('Response Body', JSON.stringify(response.body, null, 2), 'application/json');
-    })
+    });
 
-})
+});
 

@@ -7,7 +7,9 @@
     "web:wdio": "cross-env ENV=dev wdio run ./wdio-web.conf.js",
     "api:wdio": "cross-env ENV=dev wdio run ./wdio-api.conf.js",
     "allure:generate": "allure generate allure-results --clean -o allure-report",
-    "allure:open": "allure open allure-report"
+    "allure:open": "allure open allure-report",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +25,7 @@
     "allure-commandline": "^2.36.0",
     "chromedriver": "^142.0.0",
     "cross-env": "^10.1.0",
+    "eslint": "latest",
     "supertest": "^7.1.4"
   }
 }

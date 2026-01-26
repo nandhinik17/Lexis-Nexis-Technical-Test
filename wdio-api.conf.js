@@ -115,7 +115,7 @@ exports.config = {
     // Make sure you have the wdio adapter package for the specific framework installed
     // before running any tests.
     framework: 'mocha',
-    
+
     //
     // The number of times to retry the entire specfile when it fails as a whole
     // specFileRetries: 1,
@@ -226,13 +226,13 @@ exports.config = {
             // ignore
         }
     },
-    afterTest: function(test, context, { error, result, duration, passed, retries }) {
+    afterTest: function (test, context, { error, result, duration, passed, retries }) {
         try {
             delete global.__CURRENT_TEST_TITLE__;
         } catch (e) {
             // ignore
         }
-    },
+    }
     /**
      * Hook that gets executed _before_ a hook within the suite starts (e.g. runs before calling
      * beforeEach in Mocha)
@@ -320,4 +320,4 @@ exports.config = {
     */
     // afterAssertion: function(params) {
     // }
-}
+};

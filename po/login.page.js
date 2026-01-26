@@ -1,15 +1,15 @@
-const { $ } = require('@wdio/globals')
+const { $ } = require('@wdio/globals');
 class LoginPage  {
     get signInButton(){
         return $('//span[contains(text(),"Sign in")]/..');
     }
-    get inputUsername () {
+    get inputUsername() {
         return $('#username');
     }
-    get inputPassword () {
+    get inputPassword() {
         return $('#password');
     }
-    get btnSubmit () {
+    get btnSubmit() {
         return $('button[type="submit"]');
     }
     async launchApplication(){
